@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:sqlite_flutter/models/item.dart';
 import 'package:sqlite_flutter/dbHelper/dbhelper.dart';
+import 'package:sqlite_flutter/models/item.dart';
 
 class EntryForm extends StatefulWidget {
   const EntryForm({
     Key? key,
-    Item? item,
+    Barang? barang,
   }) : super(key: key);
 
   @override
@@ -13,22 +13,33 @@ class EntryForm extends StatefulWidget {
 }
 
 class EntryFormState extends State<EntryForm> {
-  Item item = Item(name: '', price: 0);
+  Barang barang = Barang(name: '', price: 0);
 
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+ 
+  void _showMessageInScaffold(String message){
+    _scaffoldKey.currentState!.showSnackBar(
+        SnackBar(
+          content: Text(message),
+        )
+    );
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     //kondisi
-    if (item != null) {
-      nameController.text = item.name;
-      priceController.text = item.price.toString();
+    if (barang.name != '') {
+      nameController.text = barang.name;
+      priceController.text = barang.price.toString();
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: item == null ? Text('Tambah') : Text('Ubah'),
+        title: barang.name == '' || barang.price == 0 ? Text('Tambah') : Text('Ubah'),
         leading: const Icon(Icons.keyboard_arrow_left),
       ),
       body: ListView(
@@ -80,19 +91,19 @@ class EntryFormState extends State<EntryForm> {
                       textScaleFactor: 1.5,
                     ),
                     onPressed: () async {
-                      if (item == null) {
+                      if (barang.name == '' || barang.price == 0) {
                         //tambah data
-                        item = Item(
+                        barang = Barang(
                             name: nameController.text,
                             price: int.parse(priceController.text));
-                        await DBHelper.createItem(item);
+                        _insert(barang);
                       } else {
                         //ubah data
-                        item.name = nameController.text;
-                        item.price = int.parse(priceController.text);
+                        barang.name = nameController.text;
+                        barang.price = int.parse(priceController.text);
                       }
                       //kembali ke layar sebelumnya dengan membawa objek item
-                      Navigator.pop(context, item);
+                      Navigator.pop(context, barang);
                     },
                   ),
                 ),
@@ -116,5 +127,10 @@ class EntryFormState extends State<EntryForm> {
         ],
       ),
     );
+  }
+
+  void _insert(barang) async {
+    final id = await DBHelper.createItem(barang);
+    _showMessageInScaffold('inserted row id: $id');
   }
 }
