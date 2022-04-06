@@ -11,12 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Tambahkan Item - Amiruddin Fikri Nur\n2031710163',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      home: const Home(),
-    );
+        // Remove the debug banner
+        debugShowCheckedModeBanner: false,
+        title: 'SQLite CRUD',
+        theme: ThemeData(
+          primarySwatch: Colors.amber,
+        ),
+        home: const HomePage());
   }
 }
